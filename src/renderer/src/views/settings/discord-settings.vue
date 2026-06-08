@@ -2,9 +2,9 @@
   <div class="flex flex-col gap-4">
     <div class="bg-opacity-5 bg-white shadow sm:rounded-lg mt-4">
       <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-100">Discord</h3>
+        <h3 class="text-lg leading-6 font-medium text-gray-100">{{ translations.discord.title }}</h3>
         <div class="mt-2 max-w-xl text-sm text-gray-200">
-          <p>Manage your Discord Rich Presence</p>
+          <p>{{ translations.discord.desc }}</p>
         </div>
         <div class="mt-3 text-sm">
           <a
@@ -12,15 +12,15 @@
             target="_blank"
             class="font-medium text-indigo-400 hover:text-indigo-300"
           >
-            Learn more about Discord's Rich Presence
+            {{ translations.discord.learnMore }}
             <span aria-hidden="true">&rarr;</span></a
           >
         </div>
       </div>
     </div>
     <div class="px-3 flex flex-col gap-4 mt-4">
-      <settings-checkbox config-key="discord.enabled"> Enable Discord </settings-checkbox>
-      <settings-checkbox config-key="discord.buttons"> Show Discord Buttons </settings-checkbox>
+      <settings-checkbox config-key="discord.enabled">{{ translations.discord.enable }}</settings-checkbox>
+      <settings-checkbox config-key="discord.buttons">{{ translations.discord.showButtons }}</settings-checkbox>
     </div>
   </div>
 </template>

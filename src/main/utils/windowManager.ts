@@ -313,6 +313,11 @@ export class WindowManager {
 					width: bounds.width - 1,
 				});
 			}
+		}).catch((err) => {
+			logger.warn("loadURL failed (may be due to redirect):", err.message);
+			if (isDevelopment || isProdDebug) {
+				this.views!.youtubeView.webContents.openDevTools({ mode: "detach" });
+			}
 		});
 	}
 

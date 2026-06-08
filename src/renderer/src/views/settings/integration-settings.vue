@@ -7,8 +7,8 @@
     >
       <div class="grid grid-cols-[1fr_100px]">
         <div class="flex flex-col">
-          <h1 class="font-semibold">LastFM</h1>
-          <p class="text-sm text-gray-300">manage your last fm connection</p>
+          <h1 class="font-semibold">{{ translations.integrations.lastfmTitle }}</h1>
+          <p class="text-sm text-gray-300">{{ translations.integrations.lastfmDesc }}</p>
         </div>
         <div class="flex items-center justify-center">
           <input
@@ -26,6 +26,7 @@
 import SectionCard from "@renderer/components/SectionCard.vue";
 import { refIpc } from "@shared/utils/Ipc";
 import { onMounted, ref } from "vue";
+
 const loading = ref(false);
 const [lastFM, setLastFM] = refIpc("LAST_FM_STATUS", {
 	ignoreUndefined: true,

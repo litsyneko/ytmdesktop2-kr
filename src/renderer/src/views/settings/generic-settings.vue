@@ -2,12 +2,9 @@
   <div class="flex flex-col gap-4">
     <div v-if="getStartedEnabled" class="bg-opacity-5 bg-white shadow sm:rounded-lg mt-4">
       <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg leading-6 font-medium text-gray-100">Get Started</h3>
+        <h3 class="text-lg leading-6 font-medium text-gray-100">{{ translations.generic.getStartedTitle }}</h3>
         <div class="mt-2 max-w-xl text-sm text-gray-200">
-          <p>
-            Welcome to YouTube Music for Desktop, here you can adjust settings to your liking aswell
-            as personalize your experience.
-          </p>
+          <p>{{ translations.generic.getStartedDesc }}</p>
         </div>
         <div class="mt-3 text-sm">
           <a
@@ -15,7 +12,7 @@
             target="_blank"
             class="font-medium text-indigo-400 hover:text-indigo-300"
           >
-            Learn more about our features
+            {{ translations.generic.learnMore }}
             <span aria-hidden="true">&rarr;</span></a
           >
         </div>
@@ -24,7 +21,7 @@
             href="#"
             class="font-medium text-red-400 hover:text-red-300"
             @click.prevent="disableGetStarted"
-            >Don't show again</a
+            >{{ translations.generic.dontShowAgain }}</a
           >
         </div>
       </div>
@@ -38,49 +35,47 @@
             : 'border-gray-500/0 bg-gray-800/0 mt-1.5',
         ]"
       >
-        <settings-checkbox config-key="app.autostart"> Enable Autostart </settings-checkbox>
+        <settings-checkbox config-key="app.autostart">{{ translations.generic.autostart }}</settings-checkbox>
         <template v-if="appAutostartEnabled">
-              <settings-checkbox config-key="app.autostartMinimized">
-                Start minimized
-              </settings-checkbox>
+          <settings-checkbox config-key="app.autostartMinimized">
+            {{ translations.generic.autostartMinimized }}
+          </settings-checkbox>
         </template>
       </div>
-      <settings-checkbox config-key="app.autoupdate"> Enable Autoupdate </settings-checkbox>
+      <settings-checkbox config-key="app.autoupdate">{{ translations.generic.autoupdate }}</settings-checkbox>
       <settings-checkbox config-key="app.enableStatisticsAndErrorTracing">
         <div class="flex flex-col">
-          <span>Allow reporting of anonymized errors to sentry.io.</span>
-          <span class="opacity-80">(allows for faster bug fixing.)</span>
+          <span>{{ translations.generic.sentryReporting }}</span>
+          <span class="opacity-80 text-xs">{{ translations.generic.sentryReportingDesc }}</span>
         </div>
       </settings-checkbox>
       <settings-checkbox config-key="app.minimizeTrayOverride">
-        Close window to tray instead of quitting
+        {{ translations.generic.minimizeToTray }}
       </settings-checkbox>
       <settings-checkbox config-key="app.enableDev" class="group">
         <div class="flex flex-col">
-          <div>Enable Developer Mode</div>
+          <div>{{ translations.generic.devMode }}</div>
           <div class="select-none opacity-80 group-hover:opacity-100 text-xs font-medium">
-            ... to design or test additional functionality.
+            {{ translations.generic.devModeDesc }}
           </div>
           <div
             class="select-none flex flex-col opacity-80 group-hover:opacity-100 text-xs font-medium"
           >
             <div class="flex space-x-1">
-              <div class="uppercase font-bold text-red-500">Hold Up!</div>
-              If someone told you to copy/paste something here you have an 11/10 chance you're being
-              scammed.
+              <div class="uppercase font-bold text-red-500">{{ translations.generic.devWarningTitle }}</div>
+              {{ translations.generic.devWarningDesc1 }}
             </div>
             <div>
-              Pasting anything in the console could give attackers access to your Google/YouTube
-              account.
+              {{ translations.generic.devWarningDesc2 }}
             </div>
           </div>
         </div>
       </settings-checkbox>
       <settings-checkbox config-key="app.disableHardwareAccel" class="group">
         <div class="flex flex-col">
-          <div>Disable Hardware Acceleration Mode</div>
+          <div>{{ translations.generic.hardwareAcceleration }}</div>
           <div class="select-none opacity-80 group-hover:opacity-100 text-xs font-medium">
-            updating this setting requires app restart.
+            {{ translations.generic.hardwareAccelerationDesc }}
           </div>
         </div>
       </settings-checkbox>
@@ -94,14 +89,14 @@
       >
         <settings-checkbox config-key="api.enabled" class="group">
           <div class="flex flex-col">
-            <div>Enable API</div>
+            <div>{{ translations.generic.enableApi }}</div>
             <div class="select-none opacity-80 group-hover:opacity-100 text-xs font-medium">
-              ... allows to utilize the clients api to extend functionality.
+              {{ translations.generic.enableApiDesc }}
             </div>
             <div
               class="select-none text-red-500 opacity-80 group-hover:opacity-100 uppercase text-xs font-medium"
             >
-              Experimental
+              {{ translations.generic.experimental }}
             </div>
           </div>
         </settings-checkbox>
@@ -114,7 +109,7 @@
             :max="39999"
             placeholder="13000-39999"
           >
-            <template #label> API Port </template>
+            <template #label>{{ translations.generic.apiPort }}</template>
           </settings-input>
         </template>
       </div>

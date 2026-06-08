@@ -1,0 +1,80 @@
+{
+  "appName": "YouTube Music for Desktop",
+  "settings": "설정",
+  "tabs": {
+    "generic": "일반",
+    "player": "플레이어",
+    "discord": "디스코드",
+    "customCss": "사용자 CSS",
+    "integrations": "연동",
+    "about": "정보"
+  },
+  "generic": {
+    "getStartedTitle": "시작하기",
+    "getStartedDesc": "YouTube Music for Desktop에 오신 것을 환영합니다. 여기에서 설정을 취향에 맞게 조정하고 환경을 개인화할 수 있습니다.",
+    "learnMore": "기능에 대해 자세히 알아보기",
+    "dontShowAgain": "다시 표시하지 않음",
+    "autostart": "자동 실행 활성화",
+    "autostartMinimized": "최소화 상태로 시작",
+    "autoupdate": "자동 업데이트 활성화",
+    "sentryReporting": "sentry.io에 익명 오류 보고 허용",
+    "sentryReportingDesc": "(더 빠른 버그 수정을 돕습니다.)",
+    "minimizeToTray": "종료 대신 트레이로 창 닫기",
+    "devMode": "개발자 모드 활성화",
+    "devModeDesc": "...추가 기능을 디자인하거나 테스트합니다.",
+    "devWarningTitle": "잠깐만요!",
+    "devWarningDesc1": "누군가 여기에 무언가를 복사/붙여넣기 하라고 했다면 사기일 확률이 110%입니다.",
+    "devWarningDesc2": "콘솔에 무언가를 붙여넣으면 공격자가 귀하의 Google/YouTube 계정에 액세스할 수 있습니다.",
+    "hardwareAcceleration": "하드웨어 가속 비활성화",
+    "hardwareAccelerationDesc": "이 설정을 변경하려면 앱을 다시 시작해야 합니다.",
+    "enableApi": "API 활성화",
+    "enableApiDesc": "...기능 확장을 위해 클라이언트 API를 활용할 수 있게 합니다.",
+    "experimental": "실험적 기능",
+    "apiPort": "API 포트"
+  },
+  "player": {
+    "title": "플레이어 설정",
+    "desc": "여기에서 플레이어 설정을 관리하세요",
+    "skipDisliked": "싫어요 한 노래 건너뛰기",
+    "volumeRatio": "새로운 볼륨 비율 처리기 적용",
+    "volumeRatioDesc": "기본 선형 슬라이더의 비효율성을 방지하고 미세 제어력을 높이기 위해 지수 볼륨 슬라이더를 적용합니다.",
+    "videoSettings": "플레이어 비디오 설정",
+    "videoSettingsDesc": "플레이어 비디오 설정을 사용자 지정합니다",
+    "preferredResolution": "선호하는 비디오 해상도 (가능한 경우)",
+    "taskbarProgress": "작업 표시줄 진행 표시 활성화",
+    "taskbarProgressDesc": "(음악이 재생되는 동안 작업 표시줄에 진행 표시줄을 표시합니다.)"
+  },
+  "discord": {
+    "title": "Discord",
+    "desc": "Discord Rich Presence 설정 관리",
+    "learnMore": "Discord Rich Presence에 대해 더 알아보기",
+    "enable": "Discord 활성화",
+    "showButtons": "Discord 버튼 표시"
+  },
+  "customCss": {
+    "enable": "사용자 정의 CSS 활성화",
+    "watching": "변경 시 실시간 반영",
+    "thumbnailBackground": "썸네일 배경 활성화",
+    "scssFile": "SCSS 파일",
+    "reload": "새로고침",
+    "openCssFile": "CSS 파일 열기"
+  },
+  "integrations": {
+    "lastfmTitle": "LastFM",
+    "lastfmDesc": "LastFM 연동 관리"
+  },
+  "about": {
+    "title": "정보",
+    "desc": "YouTube Desktop 인스턴스 정보를 보여줍니다.",
+    "version": "버전",
+    "installUpdate": "업데이트 설치",
+    "downloading": "다운로드 중...",
+    "checkForUpdate": "업데이트 확인",
+    "checkingForUpdate": "업데이트 확인 중...",
+    "beta": "사전 출시 버전 / 베타 포함"
+  },
+  "links": {
+    "website": "웹사이트",
+    "github": "깃허브"
+  }
+}

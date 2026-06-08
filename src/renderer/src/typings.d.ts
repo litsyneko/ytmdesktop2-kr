@@ -13,6 +13,7 @@ declare global {
 	}
 	declare module "*.svg" {
 		import type { FunctionalComponent } from "vue";
+
 		const content: FunctionalComponent;
 		export default content;
 	}
@@ -23,7 +24,7 @@ declare module "vue" {
 		window: typeof window;
 		console: typeof console;
 		api: typeof window.api;
-		translations: Record<string, string>;
+		translations: Record<string, any>;
 	}
 }
 

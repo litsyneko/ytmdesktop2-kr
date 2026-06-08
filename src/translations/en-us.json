@@ -1,3 +1,80 @@
 {
-	"appName": "YouTube Music for Desktop"
+  "appName": "YouTube Music for Desktop",
+  "settings": "Settings",
+  "tabs": {
+    "generic": "Generic",
+    "player": "Player",
+    "discord": "Discord",
+    "customCss": "Custom CSS",
+    "integrations": "Integrations",
+    "about": "About"
+  },
+  "generic": {
+    "getStartedTitle": "Get Started",
+    "getStartedDesc": "Welcome to YouTube Music for Desktop, here you can adjust settings to your liking aswell as personalize your experience.",
+    "learnMore": "Learn more about our features",
+    "dontShowAgain": "Don't show again",
+    "autostart": "Enable Autostart",
+    "autostartMinimized": "Start minimized",
+    "autoupdate": "Enable Autoupdate",
+    "sentryReporting": "Allow reporting of anonymized errors to sentry.io.",
+    "sentryReportingDesc": "(allows for faster bug fixing.)",
+    "minimizeToTray": "Close window to tray instead of quitting",
+    "devMode": "Enable Developer Mode",
+    "devModeDesc": "... to design or test additional functionality.",
+    "devWarningTitle": "Hold Up!",
+    "devWarningDesc1": "If someone told you to copy/paste something here you have an 11/10 chance you're being scammed.",
+    "devWarningDesc2": "Pasting anything in the console could give attackers access to your Google/YouTube account.",
+    "hardwareAcceleration": "Disable Hardware Acceleration Mode",
+    "hardwareAccelerationDesc": "updating this setting requires app restart.",
+    "enableApi": "Enable API",
+    "enableApiDesc": "... allows to utilize the clients api to extend functionality.",
+    "experimental": "Experimental",
+    "apiPort": "API Port"
+  },
+  "player": {
+    "title": "Player Settings",
+    "desc": "Manage your player settings here",
+    "skipDisliked": "Skip disliked Songs",
+    "volumeRatio": "Implement new Volume Ratio Handler",
+    "volumeRatioDesc": "Use an exponential volume slider for YouTube Music to enhance control and avoid the ineffectiveness of the default linear slider.",
+    "videoSettings": "Player Video Settings",
+    "videoSettingsDesc": "Customize player video settings",
+    "preferredResolution": "Preferred Video Resolution (if available)",
+    "taskbarProgress": "Enable Taskbar Progress",
+    "taskbarProgressDesc": "(shows a progress bar in the taskbar when playing music.)"
+  },
+  "discord": {
+    "title": "Discord",
+    "desc": "Manage your Discord Rich Presence",
+    "learnMore": "Learn more about Discord's Rich Presence",
+    "enable": "Enable Discord",
+    "showButtons": "Show Discord Buttons"
+  },
+  "customCss": {
+    "enable": "Enable Custom CSS",
+    "watching": "Update on Changes",
+    "thumbnailBackground": "Enable Thumbnail Background",
+    "scssFile": "SCSS File",
+    "reload": "Reload",
+    "openCssFile": "Open CSS File"
+  },
+  "integrations": {
+    "lastfmTitle": "LastFM",
+    "lastfmDesc": "manage your last fm connection"
+  },
+  "about": {
+    "title": "About",
+    "desc": "Shows information about your YouTube Desktop Instance",
+    "version": "Version",
+    "installUpdate": "Install Update",
+    "downloading": "Downloading...",
+    "checkForUpdate": "Check for Update",
+    "checkingForUpdate": "Checking for Updates...",
+    "beta": "Include Pre Releases / Beta"
+  },
+  "links": {
+    "website": "Website",
+    "github": "Github"
+  }
 }

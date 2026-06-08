@@ -2,25 +2,25 @@
   <div class="flex flex-col gap-4 mt-4">
     <div class="px-3 flex flex-col gap-4">
       <settings-checkbox ref="customCssToggle"
-                         config-key="customcss.enabled"> Enable Custom CSS </settings-checkbox>
-      <settings-checkbox config-key="customcss.watching"> Update on Changes </settings-checkbox>
-      <settings-checkbox config-key="customcss.thumbnailBackground"> Enable Thumbnail Background </settings-checkbox>
+                          config-key="customcss.enabled">{{ translations.customCss.enable }}</settings-checkbox>
+      <settings-checkbox config-key="customcss.watching">{{ translations.customCss.watching }}</settings-checkbox>
+      <settings-checkbox config-key="customcss.thumbnailBackground">{{ translations.customCss.thumbnailBackground }}</settings-checkbox>
       <ease-transition>
         <div v-if="customCssToggle && customCssToggle.value"
-             class="flex flex-col gap-4">
+              class="flex flex-col gap-4">
           <settings-input ref="customCssPathInput"
-                          config-key="customcss.scssFile"
-                          type="file"
-                          accept=".scss,.sass">
-            <template #label> SCSS File </template>
+                           config-key="customcss.scssFile"
+                           type="file"
+                           accept=".scss,.sass">
+            <template #label>{{ translations.customCss.scssFile }}</template>
             <template #hint>
               <div class="flex justify-end gap-2 mt-2"
                    v-if="customCssPathInput">
                 <div class="btn-group">
                   <button class="btn btn-sm"
-                          @click="reloadCSS">Reload</button>
+                          @click="reloadCSS">{{ translations.customCss.reload }}</button>
                   <button class="btn btn-sm"
-                          @click="openCSSFile">Open CSS File</button>
+                          @click="openCSSFile">{{ translations.customCss.openCssFile }}</button>
                 </div>
               </div>
             </template>
