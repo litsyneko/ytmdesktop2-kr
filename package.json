@@ -1,6 +1,6 @@
 {
 	"name": "ytmdesktop2",
-	"version": "0.0.1-alpha",
+	"version": "0.8.9-ko",
 	"private": false,
 	"author": "Venipa <admin@venipa.net>",
 	"main": "./out/main/index.js",

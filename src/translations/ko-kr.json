@@ -30,7 +30,8 @@
     "enableApi": "API 활성화",
     "enableApiDesc": "...기능 확장을 위해 클라이언트 API를 활용할 수 있게 합니다.",
     "experimental": "실험적 기능",
-    "apiPort": "API 포트"
+    "apiPort": "API 포트",
+    "language": "언어 선택"
   },
   "player": {
     "title": "플레이어 설정",

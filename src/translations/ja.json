@@ -1,0 +1,81 @@
+{
+  "appName": "YouTube Music for Desktop",
+  "settings": "設定",
+  "tabs": {
+    "generic": "一般",
+    "player": "プレイヤー",
+    "discord": "Discord",
+    "customCss": "カスタムCSS",
+    "integrations": "連携",
+    "about": "情報"
+  },
+  "generic": {
+    "getStartedTitle": "はじめに",
+    "getStartedDesc": "YouTube Music for Desktopへようこそ！ここでは、お好みに合わせて設定を調整し、体験をパーソナライズできます。",
+    "learnMore": "機能についての詳細",
+    "dontShowAgain": "二度と表示しない",
+    "autostart": "自動起動を有効にする",
+    "autostartMinimized": "最小化状態で起動",
+    "autoupdate": "自動アップデートを有効にする",
+    "sentryReporting": "sentry.ioへの匿名エラー報告を許可する",
+    "sentryReportingDesc": "（迅速なバグ修正に役立ちます）",
+    "minimizeToTray": "終了せずにトレイに最小化する",
+    "devMode": "開発者モードを有効にする",
+    "devModeDesc": "...追加機能の設計やテストを行います。",
+    "devWarningTitle": "警告！",
+    "devWarningDesc1": "ここに何かをコピー＆ペーストするように言われた場合、詐欺である可能性が非常に高いです。",
+    "devWarningDesc2": "コンソールに何かを貼り付けると、攻撃者があなたのGoogle/YouTubeアカウントにアクセスできるようになる可能性があります。",
+    "hardwareAcceleration": "ハードウェアアクセラレーションを無効にする",
+    "hardwareAccelerationDesc": "この設定を有効にするには、アプリの再起動が必要です。",
+    "enableApi": "APIを有効にする",
+    "enableApiDesc": "...連携機能拡張のためにクライアントAPIの利用を許可します。",
+    "experimental": "実験的機能",
+    "apiPort": "APIポート",
+    "language": "言語選択"
+  },
+  "player": {
+    "title": "プレイヤー設定",
+    "desc": "プレイヤーの設定を管理します",
+    "skipDisliked": "低評価した曲をスキップする",
+    "volumeRatio": "新しい音量比率ハンドラーを適用する",
+    "volumeRatioDesc": "操作性を向上させ、デフォルトの線形スライダーの非効率性を防ぐために、YouTube Musicに指数音量スライダーを使用します。",
+    "videoSettings": "プレイヤー動画設定",
+    "videoSettingsDesc": "プレイヤーの動画設定をカスタマイズします",
+    "preferredResolution": "優先ビデオ解像度 (利用可能な場合)",
+    "taskbarProgress": "タスクバーの進行状況表示を有効にする",
+    "taskbarProgressDesc": "（音楽再生中にタスクバーに進行状況バーを表示します）"
+  },
+  "discord": {
+    "title": "Discord",
+    "desc": "Discord Rich Presenceの管理",
+    "learnMore": "Discord Rich Presenceについてもっと詳しく",
+    "enable": "Discord連携を有効にする",
+    "showButtons": "Discordボタンを表示する"
+  },
+  "customCss": {
+    "enable": "カスタムCSSを有効にする",
+    "watching": "変更時にリアルタイム反映",
+    "thumbnailBackground": "サムネイル背景を有効にする",
+    "scssFile": "SCSSファイル",
+    "reload": "再読み込み",
+    "openCssFile": "CSSファイルを開く"
+  },
+  "integrations": {
+    "lastfmTitle": "LastFM",
+    "lastfmDesc": "LastFM連携の管理"
+  },
+  "about": {
+    "title": "情報",
+    "desc": "YouTube Desktopインスタンス情報を表示します",
+    "version": "バージョン",
+    "installUpdate": "アップデートをインストール",
+    "downloading": "ダウンロード中...",
+    "checkForUpdate": "アップデートを確認",
+    "checkingForUpdate": "アップデート確認中...",
+    "beta": "プレリリース / ベータ版を含める"
+  },
+  "links": {
+    "website": "ウェブサイト",
+    "github": "Github"
+  }
+}

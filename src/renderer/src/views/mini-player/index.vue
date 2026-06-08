@@ -1,254 +1,357 @@
 <template>
-  <div class="h-full absolute inset-0 overflow-hidden bg-black flex flex-col"
-       :style="{
-        ...((accentColor &&
-          showWinBorder &&
-          (showWinBorder === 'win11'
-            ? { borderWidth: '2.5px', borderStyle: 'solid' }
-            : showWinBorder
-              ? { borderWidth: '1px', borderStyle: 'solid' }
-              : {})) ||
-          {}),
-        ...((accentColor &&
-          (state.maximized || state.fullScreen || state.y === 0
-            ? { borderRadius: '0px', borderWidth: '0px' }
-            : showWinBorder === 'win11'
-              ? { borderRadius: '8px' }
-              : state.platform.isMacOS
-                ? { borderRadius: '12px' }
-                : { borderRadius: '6px' })) ||
-          {}),
-        ...(accentColor && showWinBorder ? { borderColor: `${accentColor}` } : {}),
-      }">
-    <div class="relative">
-      <control-bar title="Mini Player"
-                   class="bg-transparent border-b-0 z-20 pl-4 relative group">
-        <template #icon>
-          <MiniPlayerIcon class="antialiased" />
-        </template>
-        <template #divider>
-          <button class="control-button relative w-4 group-hover:w-auto group-hover:px-2 group-hover:space-x-2 h-4 hover:bg-white/5"
-                  @click="() => toggleStayTop()">
-            <LockIcon v-if="isTop"
-                      class="group-hover:opacity-100"></LockIcon>
-            <UnLockIcon v-else
-                        class="opacity-60"></UnLockIcon>
-            <span class="hidden group-hover:flex text-sm">Stay on Top</span>
-          </button>
-        </template>
-      </control-bar>
-      <div class="absolute h-48 inset-x-0 bg-gradient-to-b from-black to-black/0 -top-32 z-10"></div>
+  <div class="h-full absolute inset-0 overflow-hidden flex flex-col select-none rounded-xl group transition-all duration-500 bg-[#121212]"
+       :style="accentStyle">
+    <!-- Slim progress line at the very bottom (only in slim mode) -->
+    <div v-if="layoutMode === 'slim' && time" class="absolute bottom-0 left-0 right-0 h-1 bg-white/10 z-50">
+      <div class="h-full bg-[#1ed760] transition-all duration-150 animate-pulse-subtle" :style="{ width: `${time ? time[2] : 0}%` }"></div>
     </div>
-    <div class="absolute inset-0">
-      <div v-if="thumbnail && accentColor"
-           class="absolute inset-0 opacity-[.25]"
-           :style="{
-            backgroundColor: `${accentColor}`,
-          }"></div>
-      <div v-if="thumbnail"
-           class="absolute inset-0 bg-no-repeat bg-cover bg-center opacity-[.25] scale-125 blur-[8px]"
-           :style="{ backgroundImage: `url(${thumbnail})` }"></div>
+
+    <!-- Custom Spotify Header Bar (Always visible but semi-transparent, draggable background) -->
+    <div class="spotify-header absolute top-0 left-0 right-0 h-10 flex items-center justify-between px-3 z-40 select-none drag bg-gradient-to-b from-black/30 to-transparent">
+      <!-- Left: Back to Main App -->
+      <button class="no-drag header-icon-btn flex items-center justify-center w-7 h-7 rounded-full text-white/50 hover:text-white"
+              title="메인 창으로 복귀"
+              @click="closeMiniPlayer">
+        <BackToAppIcon class="w-3.5 h-3.5" />
+      </button>
+
+      <!-- Right Controls -->
+      <div class="flex items-center space-x-1 no-drag">
+        <!-- Layout Switcher Button -->
+        <button class="header-icon-btn flex items-center justify-center w-7 h-7 rounded-full text-white/50 hover:text-white"
+                title="레이아웃 전환"
+                @click="cycleLayoutMode">
+          <LayoutIcon class="w-3.5 h-3.5" />
+        </button>
+        <!-- Always on Top Pin -->
+        <button class="header-icon-btn flex items-center justify-center w-7 h-7 rounded-full"
+                :title="isTop ? '항상 위에 표시 해제' : '항상 위에 표시'"
+                @click="toggleStayTop">
+          <PinIcon class="w-3.5 h-3.5" :class="isTop ? 'text-[#1ed760] fill-[#1ed760]' : 'text-white/50 hover:text-white'" />
+        </button>
+        <!-- Close Window Button -->
+        <button class="header-icon-btn flex items-center justify-center w-7 h-7 rounded-full text-white/50 hover:text-red-500"
+                title="닫기"
+                @click="closeMiniPlayer">
+          <CloseIcon class="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
-    <div class="flex flex-col flex-1">
-      <div class="flex flex-col relative z-10 px-6 flex-1 centeronscreen">
-        <div class="flex items-start space-x-6">
-          <div class="track-thumbnail flex flex-shrink-0 items-center shadow justify-center relative">
-            <template v-if="trackBusy">
-              <div class="absolute inset-0 flex items-center justify-center z-10 rounded-[inherit] overflow-hidden">
-                <div class="absolute inset-0 bg-black/50 z-[1]"></div>
-                <div class="absolute inset-0 bg-zinc-800/80 z-[2]"
-                     :style="{
-                      ...(accentColor ? { backgroundColor: `${accentColor}20` } : {}),
-                    }"></div>
-                <Spinner size="lg"
-                         class="z-[5]" />
-              </div>
-            </template>
-            <template v-if="thumbnail">
-              <div v-if="accentColor"
-                   class="absolute inset-0 rounded-[inherit] z-[1]"
-                   :style="{
-                    boxShadow: `10px 12px 12px -2px ${accentColor}50, 0 0 0 .1rem ${accentColor}`,
-                  }"></div>
-              <div v-if="accentColor"
-                   class="absolute -inset-2 rounded-xl z-[2]"
-                   :style="{
-                    backgroundImage: `linear-gradient(${accentColor}a0, ${accentColor}00, ${accentColor}10, ${accentColor}f0)`,
-                  }"></div>
-              <div class="absolute inset-0 rounded-[inherit] overflow-hidden">
-                <img class="absolute inset-0 h-full w-full object-center object-cover opacity-[.5] scale-[1.12] blur-[4px] z-[5]"
-                     :src="thumbnail"
-                     alt=""
-                     loading="lazy"
-                     @load="handleAccent" />
-              </div>
-              <img :src="thumbnail"
-                   alt=""
-                   class="w-full object-center object-contain z-[6] rounded-[inherit]"
-                   loading="lazy" />
-            </template>
-            <div v-else
-                 class="absolute inset-0 flex items-center justify-center rounded-[inherit]">
-              <MiniPlayerIcon class="w-24 h-24 md:w-40 md:h-40 text-zinc-50"
-                              :style="{
-                                ...(accentColor ? { color: accentColor } : {}),
-                              }" />
-            </div>
-          </div>
-          <div class="flex flex-col flex-1 h-full truncate">
-            <div v-if="track?.video"
-                 class="min-w-0 flex-auto space-y-1 font-semibold truncate">
-              <h2 class="text-zinc-50 text-lg truncate">{{ track.video.title }}</h2>
-              <p class="text-zinc-400 text-sm md:text-base lg:text-lg leading-6 truncate"> by {{ track.video.author }} </p>
-              <div v-if="time"
-                   class="text-zinc-400 text-sm space-x-1 flex items-center whitespace-pre">
-                <p class="track-status-time tabular-nums">{{ time[0] }}</p>
-                <span>/</span>
-                <p class="track-status-time tabular-nums">{{ time[1] }}</p>
+
+    <!-- Layout Wrapper -->
+    <div class="player-layout flex-auto flex p-6 items-center justify-center relative z-10" :class="layoutMode">
+      
+      <!-- MODE 1: SLIM LAYOUT -->
+      <template v-if="layoutMode === 'slim'">
+        <div class="slim-container flex items-center justify-between w-full h-full pt-4">
+          <!-- Left: Thumbnail & Metadata -->
+          <div class="flex items-center min-w-0 flex-1 mr-4">
+            <div class="art-card flex-shrink-0 w-12 h-12 rounded-md overflow-hidden border border-white/5 shadow-lg relative mr-3">
+              <template v-if="trackBusy">
+                <div class="absolute inset-0 flex items-center justify-center z-20 bg-black/60 backdrop-blur-sm">
+                  <Spinner size="sm" />
+                </div>
+              </template>
+              <img v-if="thumbnail" :src="thumbnail" alt="album art" class="w-full h-full object-cover pointer-events-none" loading="lazy" @load="handleAccent" />
+              <div v-else class="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <MiniPlayerIcon class="w-4 h-4 text-zinc-600" />
               </div>
             </div>
-            <div class="flex items-center space-x-2 mt-auto flex-shrink-0">
-              <button v-if="playState?.disliked !== undefined"
-                      type="button"
-                      class="player-btn"
-                      :class="{ active: !!playState?.disliked }"
-                      :disabled="trackBusy"
-                      aria-label="Dislike"
-                      :style="{
-                        ...(accentColor && !!playState?.disliked
-                          ? { color: accentColor, stroke: '#fff' }
-                          : {}),
-                      }"
-                      @click="dislikeToggle">
-                <LikeIcon class="rotate-180" />
-              </button>
+            
+            <div class="min-w-0 flex-1 text-left">
+              <h2 v-if="track?.video" class="text-white text-xs font-bold truncate leading-tight hover:underline cursor-pointer">{{ track.video.title }}</h2>
+              <h2 v-else class="text-zinc-500 text-xs font-bold truncate">재생 중인 곡 없음</h2>
+              <p v-if="track?.video" class="text-zinc-400 text-[10px] font-medium mt-0.5 truncate">{{ track.video.author }}</p>
+              <p v-else class="text-zinc-600 text-[10px] mt-0.5">-</p>
+            </div>
+
+            <!-- Like/Dislike Thumbs -->
+            <div class="flex items-center space-x-2 ml-3 flex-shrink-0">
               <button v-if="playState?.liked !== undefined"
                       type="button"
-                      class="player-btn"
-                      :class="{ active: !!playState?.liked }"
+                      class="thumb-btn text-zinc-400 hover:text-white"
+                      :class="{ 'active': !!playState?.liked }"
                       :disabled="trackBusy"
-                      :style="{
-                        ...(accentColor && !!playState?.liked
-                          ? { color: accentColor, stroke: '#fff' }
-                          : {}),
-                      }"
-                      aria-label="Like"
+                      title="좋아요"
                       @click="likeToggle">
-                <LikeIcon />
+                <ThumbsUpIcon class="w-3.5 h-3.5 fill-current" />
               </button>
-              <button :class="{
-                'player-btn relative size-8 p-1': true,
-                'opacity-70 btn-disabled': lastFMLoading
-              }"
-                      v-if="lastFM.connected"
-                      @click="authorizeLastFM">
-                <template v-if="lastFM.connected && !lastFM.error && lastFMState !== null">
-                  <Spinner size="sm"
-                           v-if="typeof lastFMState === 'string'" />
-                  <CheckIcon v-else-if="lastFMState === true"
-                             class="text-green-500" />
-                  <AlertCircleIcon v-else-if="lastFMState === false"
-                                   class="text-red-500" />
-                </template>
-                <LastFMIcon :class="{
-                  'text-green-500': lastFM.connected && !lastFM.error,
-                  'text-red-500': lastFM.error,
-                }"
-                            v-else></LastFMIcon>
+              <button v-if="playState?.disliked !== undefined"
+                      type="button"
+                      class="thumb-btn text-zinc-400 hover:text-white"
+                      :class="{ 'active': !!playState?.disliked }"
+                      :disabled="trackBusy"
+                      title="싫어요"
+                      @click="dislikeToggle">
+                <ThumbsDownIcon class="w-3.5 h-3.5 fill-current" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Controls -->
+          <div class="flex items-center space-x-2.5 flex-shrink-0">
+            <!-- Prev Button -->
+            <button type="button" class="control-btn-spotify" :disabled="trackBusy" @click="prev">
+              <PrevIcon class="w-3.5 h-3.5 fill-current" />
+            </button>
+
+            <!-- Play/Pause -->
+            <button type="button"
+                    class="play-btn-spotify shadow-md flex items-center justify-center hover:scale-[1.06] active:scale-[0.96] transition-all duration-200"
+                    :disabled="trackBusy"
+                    @click="() => (!playing ? play() : pause())">
+              <PauseIcon v-if="playing" class="w-3.5 h-3.5 fill-black text-black" />
+              <PlayIcon v-else class="w-3.5 h-3.5 fill-black text-black ml-0.5" />
+            </button>
+
+            <!-- Next Button -->
+            <button type="button" class="control-btn-spotify" :disabled="trackBusy" @click="next">
+              <NextIcon class="w-3.5 h-3.5 fill-current" />
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- MODE 2: VERTICAL (SQUARE) LAYOUT -->
+      <template v-else-if="layoutMode === 'vertical'">
+        <div class="vertical-container flex flex-col items-center justify-center w-full pt-4">
+          <!-- Album Art -->
+          <div class="art-column relative group/art mb-3">
+            <template v-if="trackBusy">
+              <div class="absolute inset-0 flex items-center justify-center z-20 rounded-xl overflow-hidden bg-black/60 backdrop-blur-sm">
+                <Spinner />
+              </div>
+            </template>
+            <div class="art-card w-36 h-36 rounded-xl overflow-hidden border border-white/5 shadow-2xl transition-transform duration-300 group-hover/art:scale-[1.02]">
+              <img v-if="thumbnail" :src="thumbnail" alt="album art" class="w-full h-full object-cover pointer-events-none" loading="lazy" @load="handleAccent" />
+              <div v-else class="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <MiniPlayerIcon class="w-12 h-12 text-zinc-600" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Metadata & Likes -->
+          <div class="w-full flex items-center justify-between px-1 mb-2.5">
+            <div class="text-left min-w-0 flex-1 mr-4">
+              <h2 v-if="track?.video" class="text-white text-sm font-bold truncate leading-tight tracking-tight hover:underline cursor-pointer">{{ track.video.title }}</h2>
+              <h2 v-else class="text-zinc-500 text-sm font-bold truncate">재생 중인 곡 없음</h2>
+              <p v-if="track?.video" class="text-zinc-400 text-xs font-semibold mt-0.5 truncate">{{ track.video.author }}</p>
+              <p v-else class="text-zinc-600 text-xs mt-0.5">-</p>
+            </div>
+
+            <!-- Like/Dislike Thumbs -->
+            <div class="flex items-center space-x-2.5 flex-shrink-0">
+              <button v-if="playState?.liked !== undefined"
+                      type="button"
+                      class="thumb-btn text-zinc-400 hover:text-white"
+                      :class="{ 'active': !!playState?.liked }"
+                      :disabled="trackBusy"
+                      title="좋아요"
+                      @click="likeToggle">
+                <ThumbsUpIcon class="w-4 h-4 fill-current" />
+              </button>
+              <button v-if="playState?.disliked !== undefined"
+                      type="button"
+                      class="thumb-btn text-zinc-400 hover:text-white"
+                      :class="{ 'active': !!playState?.disliked }"
+                      :disabled="trackBusy"
+                      title="싫어요"
+                      @click="dislikeToggle">
+                <ThumbsDownIcon class="w-4 h-4 fill-current" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Progress Slider -->
+          <div class="w-full px-1 mb-2.5">
+            <div class="progress-track-wrapper py-1.5 cursor-pointer group/progress" @click="setCurrentTime">
+              <div class="progress-track-bg h-1 rounded-full bg-white/10 group-hover/progress:h-1.5 transition-all duration-150 relative">
+                <div ref="progressHandle" class="progress-fill h-full rounded-full absolute left-0 top-0"
+                     :style="{
+                       width: `${time ? time[2] : 0}%`,
+                       backgroundColor: '#1ed760'
+                     }">
+                  <div class="progress-thumb absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-white opacity-0 group-hover/progress:opacity-100 transition-opacity duration-150 shadow-md"></div>
+                </div>
+              </div>
+            </div>
+            <div v-if="time" class="flex justify-between text-[10px] text-zinc-500 font-semibold mt-1.5 tabular-nums">
+              <span>{{ time[0] }}</span>
+              <span>{{ time[1] }}</span>
+            </div>
+          </div>
+
+          <!-- Playback Controls -->
+          <div class="flex items-center justify-center space-x-4.5">
+            <!-- Shuffle -->
+            <button type="button" class="utility-btn-spotify text-zinc-400 hover:text-white" title="셔플" @click="toggleShuffle">
+              <ShuffleIcon class="w-3.5 h-3.5" />
+            </button>
+
+            <!-- Prev -->
+            <button type="button" class="control-btn-spotify text-zinc-400 hover:text-white" :disabled="trackBusy" @click="prev">
+              <PrevIcon class="w-3.5 h-3.5 fill-current" />
+            </button>
+
+            <!-- Play/Pause -->
+            <button type="button"
+                    class="play-btn-spotify shadow-md flex items-center justify-center hover:scale-[1.06] active:scale-[0.96] transition-all duration-200"
+                    :disabled="trackBusy"
+                    @click="() => (!playing ? play() : pause())">
+              <PauseIcon v-if="playing" class="w-4 h-4 fill-black text-black" />
+              <PlayIcon v-else class="w-4 h-4 fill-black text-black ml-0.5" />
+            </button>
+
+            <!-- Next -->
+            <button type="button" class="control-btn-spotify text-zinc-400 hover:text-white" :disabled="trackBusy" @click="next">
+              <NextIcon class="w-3.5 h-3.5 fill-current" />
+            </button>
+
+            <!-- Repeat -->
+            <button type="button" class="utility-btn-spotify text-zinc-400 hover:text-white" title="반복" @click="toggleRepeat">
+              <RepeatIcon class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <!-- MODE 3: HORIZONTAL (LANDSCAPE) LAYOUT -->
+      <template v-else>
+        <div class="horizontal-container flex items-center w-full pt-4">
+          <!-- Album Art -->
+          <div class="art-column flex-shrink-0 relative group/art mr-4">
+            <template v-if="trackBusy">
+              <div class="absolute inset-0 flex items-center justify-center z-20 rounded-xl overflow-hidden bg-black/60 backdrop-blur-sm">
+                <Spinner />
+              </div>
+            </template>
+            <div class="art-card w-20 h-20 rounded-xl overflow-hidden border border-white/5 shadow-2xl transition-transform duration-300 group-hover/art:scale-[1.02]">
+              <img v-if="thumbnail" :src="thumbnail" alt="album art" class="w-full h-full object-cover pointer-events-none" loading="lazy" @load="handleAccent" />
+              <div v-else class="w-full h-full bg-zinc-900 flex items-center justify-center">
+                <MiniPlayerIcon class="w-10 h-10 text-zinc-600" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Info & Controls Column -->
+          <div class="flex-1 min-w-0 flex flex-col justify-center">
+            <!-- Metadata & Likes -->
+            <div class="w-full flex items-center justify-between mb-1">
+              <div class="text-left min-w-0 flex-1 mr-4">
+                <h2 v-if="track?.video" class="text-white text-xs font-bold truncate leading-tight hover:underline cursor-pointer">{{ track.video.title }}</h2>
+                <h2 v-else class="text-zinc-500 text-xs font-bold truncate">재생 중인 곡 없음</h2>
+                <p v-if="track?.video" class="text-zinc-400 text-[10px] font-semibold mt-0.5 truncate">{{ track.video.author }}</p>
+                <p v-else class="text-zinc-600 text-xs mt-0.5">-</p>
+              </div>
+
+              <!-- Like/Dislike Thumbs -->
+              <div class="flex items-center space-x-2 flex-shrink-0">
+                <button v-if="playState?.liked !== undefined"
+                        type="button"
+                        class="thumb-btn text-zinc-400 hover:text-white"
+                        :class="{ 'active': !!playState?.liked }"
+                        :disabled="trackBusy"
+                        title="좋아요"
+                        @click="likeToggle">
+                  <ThumbsUpIcon class="w-3.5 h-3.5 fill-current" />
+                </button>
+                <button v-if="playState?.disliked !== undefined"
+                        type="button"
+                        class="thumb-btn text-zinc-400 hover:text-white"
+                        :class="{ 'active': !!playState?.disliked }"
+                        :disabled="trackBusy"
+                        title="싫어요"
+                        @click="dislikeToggle">
+                  <ThumbsDownIcon class="w-3.5 h-3.5 fill-current" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Progress Slider -->
+            <div class="w-full mb-1">
+              <div class="progress-track-wrapper py-1 cursor-pointer group/progress" @click="setCurrentTime">
+                <div class="progress-track-bg h-1 rounded-full bg-white/10 group-hover/progress:h-1.5 transition-all duration-150 relative">
+                  <div ref="progressHandle" class="progress-fill h-full rounded-full absolute left-0 top-0"
+                       :style="{
+                         width: `${time ? time[2] : 0}%`,
+                         backgroundColor: '#1ed760'
+                       }">
+                    <div class="progress-thumb absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-white opacity-0 group-hover/progress:opacity-100 transition-opacity duration-150 shadow-md"></div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="time" class="flex justify-between text-[9px] text-zinc-500 font-semibold mt-0.5 tabular-nums">
+                <span>{{ time[0] }}</span>
+                <span>{{ time[1] }}</span>
+              </div>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="flex items-center justify-center space-x-3.5">
+              <!-- Shuffle -->
+              <button type="button" class="utility-btn-spotify text-zinc-400 hover:text-white" title="셔플" @click="toggleShuffle">
+                <ShuffleIcon class="w-3 h-3" />
+              </button>
+
+              <!-- Prev -->
+              <button type="button" class="control-btn-spotify text-zinc-400 hover:text-white" :disabled="trackBusy" @click="prev">
+                <PrevIcon class="w-3 h-3 fill-current" />
+              </button>
+
+              <!-- Play/Pause -->
+              <button type="button"
+                      class="play-btn-spotify shadow-md flex items-center justify-center hover:scale-[1.06] active:scale-[0.96] transition-all duration-200"
+                      :disabled="trackBusy"
+                      @click="() => (!playing ? play() : pause())">
+                <PauseIcon v-if="playing" class="w-3.5 h-3.5 fill-black text-black" />
+                <PlayIcon v-else class="w-3.5 h-3.5 fill-black text-black ml-0.5" />
+              </button>
+
+              <!-- Next -->
+              <button type="button" class="control-btn-spotify text-zinc-400 hover:text-white" :disabled="trackBusy" @click="next">
+                <NextIcon class="w-3 h-3 fill-current" />
+              </button>
+
+              <!-- Repeat -->
+              <button type="button" class="utility-btn-spotify text-zinc-400 hover:text-white" title="반복" @click="toggleRepeat">
+                <RepeatIcon class="w-3 h-3" />
               </button>
             </div>
           </div>
         </div>
-      </div>
-      <div class="flex flex-col relative z-10">
-        <div v-if="time"
-             class="group pt-4 -mt-4 cursor-pointer"
-             @click="setCurrentTime">
-          <div ref="progressHandle"
-               class="h-1 group-hover:h-2 bg-white transition-all ease-in-out duration-150"
-               :style="{
-                width: `${time[2]}%`,
-                maxWidth: '100%',
-                ...(accentColor ? { backgroundColor: accentColor } : {}),
-              }"></div>
-        </div>
-        <div class="bg-zinc-50/5 mt-auto text-zinc-200 flex items-center h-16">
-          <div class="flex-auto flex items-center justify-evenly">
-            <button type="button"
-                    class="player-btn"
-                    :disabled="trackBusy"
-                    aria-label="Previous"
-                    @click="prev">
-              <PrevIcon />
-            </button>
-            <button type="button"
-                    class="player-btn"
-                    :disabled="trackBusy"
-                    aria-label="Rewind 10 seconds"
-                    @click="() => backward()">
-              <BackwardIcon />
-            </button>
-          </div>
-          <button type="button"
-                  class="player-btn-hero"
-                  :style="{
-                    ...(accentColor ? { borderColor: accentColor } : {}),
-                  }"
-                  aria-label="Pause"
-                  :disabled="trackBusy"
-                  @click="() => (!playing ? play() : pause())">
-            <div class="fill-icon fill-zinc-700">
-              <template v-if="playing">
-                <PauseIcon />
-              </template>
-              <template v-else>
-                <PlayIcon />
-              </template>
-            </div>
-          </button>
-          <div class="flex-auto flex items-center justify-evenly">
-            <button type="button"
-                    class="player-btn"
-                    :disabled="trackBusy"
-                    aria-label="Skip 10 seconds"
-                    @click="() => forward()">
-              <ForwardIcon />
-            </button>
-            <button type="button"
-                    class="player-btn"
-                    :disabled="trackBusy"
-                    aria-label="Next"
-                    @click="next">
-              <NextIcon />
-            </button>
-          </div>
-        </div>
-      </div>
+      </template>
+
     </div>
   </div>
 </template>
+
 <script lang="ts" setup>
 import type { TrackData } from "@main/utils/trackData";
-import BackwardIcon from "@renderer/assets/icons/backward10.svg";
-import ForwardIcon from "@renderer/assets/icons/forward10.svg";
-import LastFMIcon from "@renderer/assets/icons/lastfm.svg";
-import LikeIcon from "@renderer/assets/icons/like.svg";
-import LockIcon from "@renderer/assets/icons/lock.svg";
 import MiniPlayerIcon from "@renderer/assets/icons/mini-player.svg";
 import NextIcon from "@renderer/assets/icons/next.svg";
-import PauseIcon from "@renderer/assets/icons/pause.svg";
-import PlayIcon from "@renderer/assets/icons/play.svg";
 import PrevIcon from "@renderer/assets/icons/prev.svg";
-import UnLockIcon from "@renderer/assets/icons/unlock.svg";
-import ControlBar from "@renderer/components/ControlBar.vue";
 import Spinner from "@renderer/components/Spinner.vue";
 import { refLastFM } from "@renderer/lib/lastfm";
-import { refIpc, refWindowState } from "@shared/utils/Ipc";
 import { logger } from "@shared/utils/console";
+import { refIpc, refWindowState } from "@shared/utils/Ipc";
 import { intervalToDuration } from "date-fns";
 import { clamp } from "lodash-es";
-import { AlertCircleIcon, CheckIcon } from "lucide-vue-next";
-import { computed, onMounted, ref, watch } from "vue";
+import {
+  AlertCircleIcon,
+  ExternalLink as BackToAppIcon,
+  CheckIcon,
+  X as CloseIcon,
+  LayoutGrid as LayoutIcon, 
+  Pause as PauseIcon,
+  Pin as PinIcon,
+  Play as PlayIcon,
+  Repeat as RepeatIcon,
+  Shuffle as ShuffleIcon,
+  ThumbsDown as ThumbsDownIcon,
+  ThumbsUp as ThumbsUpIcon
+} from "lucide-vue-next";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+
 const zeroPad = (num) => String(num).padStart(2, "0");
 const createInterval = (dts: number[]): [string, number] => [
   dts
@@ -274,8 +377,46 @@ const [playState, setPlayState] = refIpc<{
 const showWinBorder = ref<boolean | "win11">(false);
 const trackBusy = ref(false);
 const isTop = ref(false);
+
+const windowWidth = ref(window.innerWidth);
+const windowHeight = ref(window.innerHeight);
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+  windowHeight.value = window.innerHeight;
+};
+
+const detectLayoutMode = (width: number, height: number): "vertical" | "horizontal" | "slim" => {
+  if (height <= 160) return "slim";
+  if (width / height <= 1.25) return "vertical";
+  return "horizontal";
+};
+
+const layoutMode = ref<"vertical" | "horizontal" | "slim">("vertical");
+
+// Update layout mode reactively on manual resizes
+watch([windowWidth, windowHeight], ([w, h]) => {
+  layoutMode.value = detectLayoutMode(w, h);
+});
+
+async function cycleLayoutMode() {
+  let nextMode: "vertical" | "horizontal" | "slim" = "vertical";
+  if (layoutMode.value === "vertical") {
+    nextMode = "horizontal";
+  } else if (layoutMode.value === "horizontal") {
+    nextMode = "slim";
+  } else {
+    nextMode = "vertical";
+  }
+
+  layoutMode.value = nextMode;
+  await window.api.action("miniplayer.setLayout", nextMode);
+}
+
 onMounted(() => {
   document.title = `YouTube Music - Mini Player`;
+  window.addEventListener("resize", handleResize);
+  layoutMode.value = detectLayoutMode(window.innerWidth, window.innerHeight);
   Promise.all([
     window.ipcRenderer.invoke("api/track"),
     window.ipcRenderer.invoke("api/track/state"),
@@ -287,25 +428,38 @@ onMounted(() => {
     setPlayState(playStateData);
     showWinBorder.value = window.process.platform === "win32" ? (isWin11 ? "win11" : true) : windowState.platform.isMacOS;
     isTop.value = stayTop;
-    console.log({
-      showWinBorder: showWinBorder.value,
-      platform: window.process.platform,
-      isWin11,
-    });
   });
 });
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
+
+const accentStyle = computed(() => {
+  if (!accentColor.value) {
+    return {
+      background: "#121212"
+    };
+  }
+  // Hex with alpha transparency (e.g. 24 is ~14% opacity) for a sleek backdrop glow
+  return {
+    background: `linear-gradient(135deg, ${accentColor.value}24 0%, #121212 100%)`
+  };
+});
+
 const { lastFM, lastFMLoading, lastFMState, authorizeLastFM } = refLastFM();
 const progressHandle = ref<HTMLElement>(null);
 let accentHandle: any;
+
 const getCurrentAccent = (retry: number = 0) => {
   if (accentHandle) clearTimeout(accentHandle);
   window.ipcRenderer.invoke("api/track/accent").then((clr) => {
     if (!clr || retry > 2) accentColor.value = clr || null;
     else accentColor.value = clr;
-    console.log("Accent", clr);
     if (!clr) accentHandle = setTimeout(getCurrentAccent.bind(this, retry + 1), 500);
   });
 };
+
 function next() {
   trackBusy.value = true;
   return window.ipcRenderer
@@ -317,6 +471,7 @@ function next() {
       playState.value.progress = 0;
     });
 }
+
 function prev() {
   trackBusy.value = true;
   return window.ipcRenderer.invoke("api/track/prev").finally(() => {
@@ -324,37 +479,15 @@ function prev() {
     playState.value.progress = 0;
   });
 }
-function forward(time = 10000) {
-  trackBusy.value = true;
-  return window.ipcRenderer.invoke("api/track/forward", { time }).finally(() => {
-    trackBusy.value = false;
-  });
-}
-function backward(time = 10000) {
-  trackBusy.value = true;
-  return window.ipcRenderer.invoke("api/track/backward", { time }).finally(() => {
-    trackBusy.value = false;
-  });
-}
+
 function pause() {
-  // trackBusy.value = true;
-  return window.ipcRenderer.invoke("api/track/pause").finally(() => {
-    // trackBusy.value = false;
-  });
+  return window.ipcRenderer.invoke("api/track/pause");
 }
+
 function play() {
-  // trackBusy.value = true;
-  return window.ipcRenderer.invoke("api/track/play").finally(() => {
-    // trackBusy.value = false;
-  });
+  return window.ipcRenderer.invoke("api/track/play");
 }
-function dislikeToggle() {
-  if (typeof playState.value?.disliked !== "boolean") return;
-  trackBusy.value = true;
-  return window.ipcRenderer.invoke("api/track/dislike", !playState.value.disliked).finally(() => {
-    trackBusy.value = false;
-  });
-}
+
 function likeToggle() {
   if (typeof playState.value?.liked !== "boolean") return;
   trackBusy.value = true;
@@ -362,42 +495,58 @@ function likeToggle() {
     trackBusy.value = false;
   });
 }
+
+function dislikeToggle() {
+  if (typeof playState.value?.disliked !== "boolean") return;
+  trackBusy.value = true;
+  return window.ipcRenderer.invoke("api/track/dislike", !playState.value.disliked).finally(() => {
+    trackBusy.value = false;
+  });
+}
+
 function handleAccent(ev: Parameters<HTMLImageElement["onload"]>[0]) {
   const src = (ev.target as HTMLImageElement).src;
   if (src) {
     getCurrentAccent();
   }
 }
+
 function setCurrentTime(ev: MouseEvent) {
   if (trackBusy.value) return;
   if (!playState.value) return;
-  const [el, progress] = [ev.currentTarget as HTMLDivElement, progressHandle.value];
-  const percSelected = ev.x / el.clientWidth;
+  const el = ev.currentTarget as HTMLDivElement;
+  const rect = el.getBoundingClientRect();
+  const percSelected = (ev.clientX - rect.left) / rect.width;
   const { duration } = playState.value;
   const seekTime = clamp(duration * percSelected, 0, duration) * 1000;
-  console.log({
-    percentage: percSelected,
-    value: seekTime / 1000,
-    duration,
-  });
+
   trackBusy.value = true;
   return window.ipcRenderer.invoke("api/track/seek", { time: seekTime, type: "seek" }).finally(() => {
     trackBusy.value = false;
   });
 }
+
 async function toggleStayTop() {
   const result = await window.api.action("miniplayer.stayOnTop");
   isTop.value = result;
 }
-function action(actionParam, ...params) {
-  return window.api.action(actionParam, ...params);
+
+function closeMiniPlayer() {
+  window.api.closeWindow();
 }
-function invoke(invokeParam, ...params) {
-  return window.api.invoke(invokeParam, ...params);
+
+function toggleShuffle() {
+  window.ipcRenderer.invoke("api/track/shuffle");
 }
+
+function toggleRepeat() {
+  window.ipcRenderer.invoke("api/track/repeat");
+}
+
 const thumbnail = computed(() => {
   return track.value?.meta?.thumbnail;
 });
+
 const playing = computed(() => {
   return !!playState.value?.playing;
 });
@@ -416,81 +565,215 @@ const time = computed((): [string, string, number] => {
   const percentage = ((progress > duration ? duration : progress) / duration) * 100;
   return [current.padEnd(timePad), end.padStart(timePad), percentage];
 });
+
 watch(state, (windowState) => logger.debug(windowState && { ...windowState }));
 </script>
-<style lang="scss">
-.track-status-time {
-  @apply min-w-[40px];
+
+<style lang="scss" scoped>
+/* Spotify Ambient backdrop gradient transition */
+.group {
+  transition: background 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.player-btn {
-  @apply h-10 w-10 text-zinc-200 p-2 cursor-pointer flex items-center justify-center rounded-lg transition ease-in-out duration-100;
+/* Custom Spotify Header overlay */
+.spotify-header {
+  .no-drag {
+    -webkit-app-region: no-drag !important;
+  }
+}
+
+.header-icon-btn {
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+/* Layout setups */
+.player-layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+  box-sizing: border-box;
+  
+  &.slim {
+    padding: 8px 16px;
+  }
+  
+  &.horizontal {
+    padding: 12px 18px;
+  }
+}
+
+/* Micro-animations */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s infinite ease-in-out;
+}
+
+/* Spotify buttons styling */
+.control-btn-spotify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #b3b3b3;
+  -webkit-app-region: no-drag;
+
+  svg {
+    fill: currentColor;
+  }
 
   &:hover {
-    @apply bg-zinc-50/5;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
   }
 
   &:active {
-    @apply transform-gpu scale-95 bg-zinc-50/10;
+    transform: scale(0.9);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.utility-btn-spotify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #b3b3b3;
+  -webkit-app-region: no-drag;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
   }
 
-  &:disabled,
-  &.disabled {
-    @apply opacity-60 scale-100;
+  &:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Play/Pause Spotify White Circular Button */
+.play-btn-spotify {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  -webkit-app-region: no-drag;
+  
+  svg {
+    color: #000000;
+  }
+
+  &:hover {
+    background-color: #f6f6f6;
+    transform: scale(1.06);
+  }
+  
+  &:active {
+    transform: scale(0.94);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+/* Thumbs Up / Thumbs Down Styles */
+.thumb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  outline: none;
+  -webkit-app-region: no-drag;
+  transition: all 0.2s ease;
+  
+  svg {
+    stroke: #b3b3b3;
+    fill: transparent;
+    transition: all 0.2s ease;
+  }
+
+  &:hover svg {
+    stroke: #ffffff;
   }
 
   &.active {
     svg {
-      @apply fill-current;
-
-      path {
-        @apply stroke-inherit;
-      }
+      stroke: #1ed760;
+      fill: #1ed760;
+    }
+    &:hover svg {
+      stroke: #1fdf64;
+      fill: #1fdf64;
     }
   }
-
-  &-hero {
-    @apply border border-zinc-600 text-zinc-200 flex-none mx-auto w-10 h-10 rounded-full ring-1 ring-zinc-900/5 shadow-md flex items-center justify-center transition ease-in-out duration-100;
-
-    svg {
-      @apply h-6 w-6;
-    }
-
-    &:disabled,
-    &.disabled {
-      @apply opacity-60 scale-100;
-    }
-
-    &:active {
-      @apply transform-gpu scale-95 border-zinc-50/90;
-    }
+  
+  &:active {
+    transform: scale(0.9);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
-.fill-icon {
-  svg {
-    @apply fill-current;
-
-    path {
-      @apply stroke-transparent;
-    }
-  }
-}
-
-.centeronscreen {
-  @apply flex flex-col justify-center;
-}
-
-.track-thumbnail {
-  @apply flex-none rounded-lg bg-zinc-800;
-
-  height: calc(100vh - 10rem);
-  width: calc(100vh - 10rem);
-  max-width: calc(100vw - 16rem);
-  max-height: calc(100vw - 16rem);
-
+/* Draggable parts */
+.art-card,
+.art-column {
+  -webkit-app-region: drag;
+  
   img {
-    @apply object-cover object-center;
+    -webkit-app-region: drag;
   }
+}
+
+/* Progress Slider */
+.progress-track-wrapper {
+  -webkit-app-region: no-drag;
 }
 </style>

@@ -1,0 +1,81 @@
+{
+  "appName": "YouTube Music for Desktop",
+  "settings": "设置",
+  "tabs": {
+    "generic": "常规",
+    "player": "播放器",
+    "discord": "Discord",
+    "customCss": "自定义CSS",
+    "integrations": "集成",
+    "about": "关于"
+  },
+  "generic": {
+    "getStartedTitle": "开始使用",
+    "getStartedDesc": "欢迎使用 YouTube Music for Desktop，您可以在这里调整设置以符合您的偏好并个性化您的体验。",
+    "learnMore": "了解更多关于我们功能的信息",
+    "dontShowAgain": "不再显示",
+    "autostart": "启用开机自启",
+    "autostartMinimized": "最小化启动",
+    "autoupdate": "启用自动更新",
+    "sentryReporting": "允许向 sentry.io 报告匿名错误",
+    "sentryReportingDesc": "（以便更快速地修复漏洞）",
+    "minimizeToTray": "关闭窗口时最小化到系统托盘",
+    "devMode": "启用开发者模式",
+    "devModeDesc": "...设计或测试附加功能。",
+    "devWarningTitle": "请注意！",
+    "devWarningDesc1": "如果有人让你在这里复制/粘贴内容，有 110% 的可能是欺诈行为。",
+    "devWarningDesc2": "在控制台中粘贴任何内容都可能使攻击者能够访问你的 Google/YouTube 帐户。",
+    "hardwareAcceleration": "禁用硬件加速模式",
+    "hardwareAccelerationDesc": "更新此设置需要重新启动应用程序。",
+    "enableApi": "启用 API",
+    "enableApiDesc": "...允许利用客户端 API 扩展功能。",
+    "experimental": "实验性",
+    "apiPort": "API 端口",
+    "language": "选择语言"
+  },
+  "player": {
+    "title": "播放器设置",
+    "desc": "在此处管理您的播放器设置",
+    "skipDisliked": "跳过不喜欢的歌曲",
+    "volumeRatio": "应用新的音量比例处理器",
+    "volumeRatioDesc": "为 YouTube Music 使用指数级音量滑块，以增强控制并避免默认线性滑块的无效性。",
+    "videoSettings": "播放器视频设置",
+    "videoSettingsDesc": "自定义播放器视频设置",
+    "preferredResolution": "首选视频分辨率（如果可用）",
+    "taskbarProgress": "启用任务栏进度条",
+    "taskbarProgressDesc": "（在播放音乐时于任务栏中显示进度条）"
+  },
+  "discord": {
+    "title": "Discord",
+    "desc": "管理您的 Discord Rich Presence",
+    "learnMore": "了解更多关于 Discord Rich Presence 的信息",
+    "enable": "启用 Discord 状态",
+    "showButtons": "显示 Discord 按钮"
+  },
+  "customCss": {
+    "enable": "启用自定义 CSS",
+    "watching": "更改时实时更新",
+    "thumbnailBackground": "启用缩略图背景",
+    "scssFile": "SCSS 文件",
+    "reload": "重新加载",
+    "openCssFile": "打开 CSS 文件"
+  },
+  "integrations": {
+    "lastfmTitle": "LastFM",
+    "lastfmDesc": "管理您的 LastFM 连接"
+  },
+  "about": {
+    "title": "关于",
+    "desc": "显示关于您的 YouTube Desktop 实例的信息",
+    "version": "版本",
+    "installUpdate": "安装更新",
+    "downloading": "正在下载...",
+    "checkForUpdate": "检查更新",
+    "checkingForUpdate": "正在检查更新...",
+    "beta": "包含预发布/测试版本"
+  },
+  "links": {
+    "website": "网站",
+    "github": "Github"
+  }
+}

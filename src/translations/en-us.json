@@ -30,7 +30,8 @@
     "enableApi": "Enable API",
     "enableApiDesc": "... allows to utilize the clients api to extend functionality.",
     "experimental": "Experimental",
-    "apiPort": "API Port"
+    "apiPort": "API Port",
+    "language": "Select Language"
   },
   "player": {
     "title": "Player Settings",

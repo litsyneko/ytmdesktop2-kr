@@ -27,6 +27,19 @@
       </div>
     </div>
     <div class="px-3 flex flex-col gap-4 mt-4">
+      <!-- Language Selector -->
+      <div class="flex flex-col gap-4 -mx-3 px-3 py-3 rounded-lg border border-white/5 bg-black/10">
+        <settings-select config-key="app.language" class="bg-transparent border-0" :default-value="systemLang">
+          <template #label>{{ translations.generic.language }}</template>
+          <template #options>
+            <option value="en">English (US)</option>
+            <option value="ko">한국어 (Korean)</option>
+            <option value="ja">日本語 (Japanese)</option>
+            <option value="zh">简体中文 (Chinese)</option>
+          </template>
+        </settings-select>
+      </div>
+
       <div
         :class="[
           'flex flex-col gap-y-1 border -mx-3 px-3',
@@ -120,11 +133,29 @@
 <script lang="ts" setup>
 import SettingsCheckbox from "@renderer/components/SettingsCheckbox.vue";
 import SettingsInput from "@renderer/components/SettingsInput.vue";
+import SettingsSelect from "@renderer/components/SettingsSelect.vue";
 import { refIpcSetting } from "@shared/utils/Ipc";
+import { onMounted, watch } from "vue";
 
 const [getStartedEnabled] = refIpcSetting("app.getstarted");
 const [apiEnabledSetting] = refIpcSetting("api.enabled");
 const [appAutostartEnabled] = refIpcSetting("app.autostart");
+const [appLanguage] = refIpcSetting<string>("app.language");
+
+const systemLang = navigator.language.startsWith("ko") ? "ko" : navigator.language.startsWith("ja") ? "ja" : navigator.language.startsWith("zh") ? "zh" : "en";
+
+onMounted(() => {
+	if (appLanguage.value) {
+		localStorage.setItem("app.language", appLanguage.value);
+	}
+});
+
+watch(appLanguage, (newLang, oldLang) => {
+	if (oldLang !== undefined && newLang && newLang !== oldLang) {
+		localStorage.setItem("app.language", newLang);
+		window.location.reload();
+	}
+});
 
 const disableGetStarted = () => {
 	window.api.settingsProvider.update("app.getstarted", false).then((v) => {

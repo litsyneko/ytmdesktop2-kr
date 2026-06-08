@@ -25,7 +25,7 @@ export default defineComponent({
 			type: String,
 			required: true,
 		},
-		defaultValue: Object,
+		defaultValue: [String, Object],
 		label: String,
 	},
 	setup(context) {
